@@ -37,7 +37,7 @@ const HomeScreen = () => {
   };
 
   return (
-    <SafeAreaView style={{marginTop:StatusBar.currentHeight}}>
+    <SafeAreaView>
       <TouchableOpacity onPress={() => navigation.navigate('Transaction')}>
         <View style={styles.header}>
           <Ionicons name="stats-chart" size={42} color="black" />
