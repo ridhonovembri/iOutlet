@@ -1,6 +1,9 @@
 import { SQLiteProvider } from "expo-sqlite";
-import AppNavigator from "./components/AppNavigator";
+import AppNavigator from "./navigations/AppNavigator";
 import { AppProvider } from "./context/AppContext";
+import { useFonts } from "expo-font";
+import * as SplashScreen from "expo-splash-screen";
+import { useCallback } from "react";
 
 async function initializeDatabase(db) {
   try {
@@ -22,7 +25,7 @@ async function initializeDatabase(db) {
         CREATE TABLE IF NOT EXISTS categories (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           category_name TEXT
-        );    
+        );            
         CREATE TABLE IF NOT EXISTS tables (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           table_no TEXT,
@@ -38,7 +41,7 @@ async function initializeDatabase(db) {
           customer_name TEXT,          
           phone_number TEXT
         );
-         CREATE TABLE IF NOT EXISTS orders(
+        CREATE TABLE IF NOT EXISTS orders(
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             order_no TEXT,
             order_date DATE,
@@ -54,8 +57,7 @@ async function initializeDatabase(db) {
             FOREIGN KEY(customer_id) REFERENCES customers(id) ON UPDATE SET NULL ON DELETE SET NULL,
             FOREIGN KEY(table_id) REFERENCES tables(id) ON UPDATE SET NULL ON DELETE SET NULL,
             FOREIGN KEY(area_id) REFERENCES areas(id) ON UPDATE SET NULL ON DELETE SET NULL    
-        );  
-       
+        );         
         CREATE TABLE IF NOT EXISTS employees (
           id INTEGER PRIMARY KEY AUTOINCREMENT,
           empl_no TEXT,
@@ -78,6 +80,25 @@ async function initializeDatabase(db) {
 }
 
 export default function App() {
+  const [fontsLoaded] = useFonts({
+    bold: require("./assets/fonts/Poppins-Bold.ttf"),
+    extraBold: require("./assets/fonts/Poppins-ExtraBold.ttf"),
+    light: require("./assets/fonts/Poppins-Light.ttf"),
+    medium: require("./assets/fonts/Poppins-Medium.ttf"),
+    regular: require("./assets/fonts/Poppins-Regular.ttf"),
+    semiBold: require("./assets/fonts/Poppins-SemiBold.ttf"),
+  });
+
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded) {
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded]);
+
+  if (!fontsLoaded) {
+    return null;
+  }
+
   return (
     <SQLiteProvider databaseName="mySQLiteDB.db" onInit={initializeDatabase}>
       <AppProvider>

@@ -20,7 +20,7 @@ export const GetAllOrders = async (successCallBack) => {
 };
 
 export const GetByOrderNo = async (orderNo, successCallBack) => {
-  // console.log("order dal", order);
+  console.log("order dal", orderNo);
   try {
     const db = await ConnectToDB();
     const data = await db.getAllAsync(`
@@ -38,12 +38,11 @@ export const GetByOrderNo = async (orderNo, successCallBack) => {
 };
 
 export const AddOrder = async (orders) => {
-  // console.log("prd dal", item);
+  // console.log("prd dal", orders);
   try {
     const db = await ConnectToDB();
-    let status = false;
 
-    let orderNumber = 0;
+    let orderNumber = "";
     let now = new Date();
 
     orderNumber = now.getFullYear().toString();
@@ -56,44 +55,49 @@ export const AddOrder = async (orders) => {
     orderNumber +=
       (now.getSeconds() < 10 ? "0" : "") + now.getSeconds().toString();
 
-    // const result = (orders) =>
-    // new Promise((resolve, reject) => {
+    const orderDate = moment(new Date()).format("DD-MM-YYYY HH:mm:ss");
 
-    const results = await Promise.all(
-      orders.map(async (item, index) => {
-        const orderNo = orderNumber;
-        const orderDate = moment(new Date()).format("DD-MM-YYYY HH:mm:ss");
+    let promise = new Promise((resolve, reject) => {
+      orders.map(async (order, index) => {
+        const productId = order.productId;
+        const qty = order.qty;
         const orderDiscount = 0;
-        const orderAmunt = item.qty * item.price;
+        const orderAmunt = order.qty * order.price;
+        const customerId = null;
+        const tableId = null;
+        const areaId = null;
+        const remarks = order.remarks;
 
         const statement =
           await db.prepareAsync(`INSERT INTO orders (order_no, order_date, product_id, qty, customer_id, table_id,
                                                      area_id, order_discount, order_amount, remarks) VALUES(?,?,?,?,?,?,?,?,?,?)`);
-
         const result = await statement.executeAsync([
-          orderNo,
+          orderNumber,
           orderDate,
-          item.productId,
-          item.qty,
-          null,
-          null,
-          null,
+          productId,
+          qty,
+          customerId,
+          tableId,
+          areaId,
           orderDiscount,
           orderAmunt,
-          item.remarks,
+          remarks,
         ]);
-      })
-    );
 
-    // console.log("dal-orderNumber", orderNumber);
+        // console.log("result.changes", result.changes);
 
-    return orderNumber;
+        if (result.changes > 0) {
+          resolve({ orderNumber: orderNumber, status: true });
+        } else {
+          reject({ orderNumber: 0, status: false });
+        }
+      });
+    });
+
+    return promise;
   } catch (error) {
     throw error;
   }
 };
 
-export const DeleteOrderItem = async () => {
-
-
-};
+export const DeleteOrderItem = async () => {};

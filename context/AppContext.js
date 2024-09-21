@@ -9,6 +9,7 @@ const AppProvider = ({ children }) => {
   const [categories, setCategories] = useState({});
   const [products, setProducts] = useState({});
   const [cart, setCart] = useState([])
+  const [orderNoCtx, setOrderNoCtx] = useState()
 
   const getCategories = async () => {
     await GetAllCategories(setCategories);
@@ -24,7 +25,7 @@ const AppProvider = ({ children }) => {
   }, []);
 
   return (
-    <Ctx.Provider value={{categories, setCategories, products, setProducts, cart, setCart }}>
+    <Ctx.Provider value={{categories, setCategories, products, setProducts, cart, setCart, orderNoCtx, setOrderNoCtx }}>
       {children}
     </Ctx.Provider>
   );
